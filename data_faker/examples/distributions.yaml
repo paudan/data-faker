@@ -1,0 +1,70 @@
+length: 2000
+columns:
+  - name: 'normal feature'
+    params:
+      distribution:
+        type: 'Gaussian'
+        params:
+          mean: 0.5
+          sigma: 0.1
+  - name: 'lognormal feature'
+    params:
+      distribution:
+        type: 'lognormal'
+        params:
+          mean: 0.5
+          sigma: 0.1
+  - name: 'poisson feature'
+    params:
+      distribution:
+        type: 'Poisson'
+        params:
+          lambda: 10
+  - name: 'beta feature'
+    params:
+      distribution:
+        type: 'Beta'
+        params:
+          a: 2
+          b: 5
+  - name: 'binomial feature'
+    params:
+      distribution:
+        type: 'Binomial'
+        params:
+          n: 5
+          p: 0.5
+  - name: 'gamma feature'
+    params:
+      distribution:
+        type: 'Gamma'
+        params:
+          gamma: 2
+          scale: 2
+  - name: 'uniform feature'
+    params:
+      distribution:
+        type: 'uniform'
+        params:
+          low: 1
+          high: 10
+  - name: 'chi-square feature'
+    params:
+      distribution:
+        type: 'chi-square'
+        params:
+          df: 5
+  - name: 'weibull feature'
+    params:
+      distribution:
+        type: 'Weibull'
+        params:
+          a: 5
+  - name: 'triangular feature'
+    params:
+      distribution:
+        type: 'triangular'
+        params:
+          left: -3
+          mode: 0
+          right: 10

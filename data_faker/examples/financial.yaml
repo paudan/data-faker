@@ -1,0 +1,120 @@
+length: 20000
+columns:
+  - name: 'cash'
+    type: int32
+    params:
+      min: 0
+      max: 4500000
+  - name: 'current assets'
+    type: int32
+    params:
+      max: 25000000
+  - name: 'ebitda'
+    type: int32
+    params:
+      max: 5000000
+  - name: 'tangibles'
+    type: int8
+    params:
+      max: 4
+  - name: "fixed assets"
+    type: int32
+    params:
+      max: 5000000
+  - name: 'long-term debt'
+    type: int32
+    params:
+      max: 50000000
+  - name: 'ROI'
+    type: float16
+    params:
+      min: 4
+      max: 10
+  - name: 'employees'
+    type: int16
+    params:
+      max: 200
+  - name: 'profit'
+    type: int32
+    params:
+      max: 300000000
+  - name: 'margin'
+    type: float16
+    params:
+      min: -10
+      max: 20
+  - name: 'ROA'
+    type: float16
+    params:
+      min: -4
+      max: 10
+  - name: 'sales'
+    type: int32
+    params:
+      max: 50000000
+  - name: 'total assets'
+    type: int32
+    params:
+      max: 1000000000
+  - name: 'turnover'
+    type: int32
+    params:
+      max: 50000000
+  - name: 'capital'
+    type: int32
+    params:
+      max: 150000000
+      distribution:
+        type: 'gaussian'
+  - name: 'year'
+    type: year
+    params:
+      from: 2005
+  - name: 'month'
+    type: month
+    params:
+      from: 1
+      to: 12
+  - name: 'day'
+    type: day
+    params:
+      from: 10
+      to: 31
+  - name: 'day of week'
+    type: weekday
+  - name: 'date'
+    type: date
+    params:
+      from: '2015-05-31'
+      to: '2017-05-31'
+      format: '%Y-%m-%d'
+  - name: 'time'
+    type: time
+    params:
+      format: '%H:%M:%S'
+  - name: 'currency'
+    type: currency
+    params:
+      list:
+        - USD
+        - EUR
+        - YEN
+      count: 10
+  - name: 'name'
+    type: name
+    params:
+      count: 10
+      locale: 'lt-LT'
+  - name: 'country'
+    type: country
+    params:
+      code: True
+  - name: 'city'
+    type: city
+  - name: 'company'
+    type: company
+  - name: 'has credit'
+    type: boolean
+    params:
+      as_int: False
+output: 'result.csv'
