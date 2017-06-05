@@ -11,7 +11,7 @@ The package can be easily from GitHub repository installed using Python's *pip* 
 Usage
 -----
 
-The usage is simply straightforward, identical to scikit's feature selection module:
+Dataset generation is fairly straightforward:
 
 .. code:: python
 
@@ -41,6 +41,7 @@ Requirements
 ------------
 
 This tool requires several other Python libraries to function:
+
 - `NumPy <http://www.numpy.org/>`_
 - `Pandas <http://pandas.pydata.org/>`_
 - `faker <https://pypi.python.org/pypi/Faker>`_
