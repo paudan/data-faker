@@ -30,7 +30,7 @@ or::
     datafaker --output-file output.csv examples/distributions.yaml
 
 Currently the tool supports only serialization to CSV file. However, one can easily serialize the created dataset to other formats, by generating
-Pandas dataframe directly using ``generate_pandas`` method, and using internal pandas methods or third-party tools.
+Pandas dataframe directly using ``generate_pandas`` method, and using internal ``pandas`` methods or third-party tools.
 
 Specification
 -------------

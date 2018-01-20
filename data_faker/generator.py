@@ -23,7 +23,8 @@ class ConfigurationException(Exception):
 def _get_param(_params, name, default=None):
     if name is None:
         return None
-    return _params[name] if _params is not None and _params.has_key(name) else default
+    value = _params.get(name) if _params else None
+    return value if value is not None else default
 
 
 def _get_dist_param(column, default=None):
@@ -66,8 +67,8 @@ def _generate_gaussian(column, dtype, length):
             _max = _max if _max is not None else 0
         _dist = _get_dist_param(column, 'Gaussian')
         _dist = _get_param(_dist, 'type') if _dist else None
-        if _dist and _dist.lower() == 'gaussian':
-            if issubclass(dtype, np.integer):
+        if _dist is not None and _dist.lower() == 'gaussian':
+            if np.issubdtype(dtype, np.integer):
                 return np.random.randint(low=_min, high=_max, dtype=dtype, size=length)
             else:
                 values = _min + np.random.rand(length, 1) * (_max - _min)
@@ -144,6 +145,8 @@ def _generate_distribution(column, length, dtype=None):
             _mode = _get_param(_params, 'mode')
             _right = _get_param(_params, 'right')
             return np.random.triangular(left=_left, mode=_mode, right=_right, size=length)
+    elif dtype is not None:
+        return _generate_gaussian(column, dtype, length)
 
 
 def _validate_configuration(conf_file):
@@ -190,7 +193,7 @@ def _validate_configuration(conf_file):
             raise ConfigurationException("Feature '{2}': '{0}' parameter must be set for {1}"
                                          .format(a, _str, _label), conf_file)
         if check_positive and (_a is not None and _a < 0):
-            raise ConfigurationException("Feature '{3}': '{0}' parameter for {1} must be positive"
+            raise ConfigurationException("Feature '{2}': '{0}' parameter for {1} must be positive"
                                          .format(a, _str, _label), conf_file)
 
     with open(conf_file, 'r') as stream:
@@ -209,29 +212,30 @@ def _validate_configuration(conf_file):
         if not _dist_params:
             try:
                 _type_num = np.issubdtype(np.dtype(_type).type, np.number)
-            except TypeError, ex:
+            except TypeError as ex:
                 _type_num = False
             if not _type:
                 raise ConfigurationException('Type is not set for {0}:'.format(_label), conf_file)
-            if _type not in ['day', 'month', 'weekday', 'year', 'date', 'time', 'name', 'country', 'city', 'company', 'currency', 'boolean'] \
+            if _type not in ['day', 'month', 'weekday', 'year', 'date', 'time',
+                             'name', 'country', 'city', 'company', 'currency', 'boolean'] \
                     and not _type_num:
                 raise ConfigurationException('Invalid type for %s:' % _label, conf_file)
         if _type == 'date':
             _params = _get_param(column, 'params')
-            _to = parser.parse(_params['to']) if _params and _params.has_key('to') else datetime.now()
-            _from = parser.parse(_params['from']) if _params and _params.has_key('from') else _to
+            _to = parser.parse(_params.get('to')) if _params and _params.get('to') is not None else datetime.now()
+            _from = parser.parse(_params.get('from')) if _params and _params.get('from') is not None else _to
             if _from > _to:
                 raise ConfigurationException('Invalid date range for {0}: [{1}; {2}]'.format(_from, _to, _label), conf_file)
         else:
             _params = _get_param(column, 'params')
             if not _params:
                 continue
-            if _params.has_key('min') and _params.has_key('max'):
+            if not None in [_params.get('min'), _params.get('max')]:
                 _from = _get_param(_params, 'min')
                 _to = _get_param(_params, 'max')
                 if _from > _to:
                     raise ConfigurationException('Invalid numeric range for {0}: [{1}; {2}]'.format(_from, _to, _label), conf_file)
-            if _params.has_key('distribution'):
+            if _params.get('distribution') is not None:
                 _dist = _get_param(_dist_params, 'type')
                 if _dist is None:
                     raise ConfigurationException('Distribution type is not set for {0}:'.format(_label), conf_file)
@@ -252,8 +256,10 @@ def _validate_configuration(conf_file):
                 elif _dist.lower() == 'lognormal':
                     check_params(_dist_params, 'mean', 'sigma', 'lognormal distribution')
                 elif _dist.lower() == 'triangular':
-                    check_params(_dist_params, 'left', 'mode', 'triangular distribution', check_greater=True, check_positive=False)
-                    check_params(_dist_params, 'mode', 'right', 'triangular distribution', check_greater=True, check_positive=False)
+                    check_params(_dist_params, 'left', 'mode', 'triangular distribution',
+                                 check_greater=True, check_positive=False)
+                    check_params(_dist_params, 'mode', 'right', 'triangular distribution',
+                                 check_greater=True, check_positive=False)
 
 
 def generate_pandas(conf_file):
@@ -283,8 +289,8 @@ def generate_pandas(conf_file):
             data[_label] = _generate_range(column, datetime.min.year, datetime.now().year, np.uint16, length, conf_file)
         elif _type == 'date':
             _params = _get_param(column, 'params')
-            _to = parser.parse(_params['to']) if _params and _params.has_key('to') else datetime.now()
-            _from = parser.parse(_params['from']) if _params and _params.has_key('from') else _to
+            _to = parser.parse(_params['to']) if _params and _params.get('to') is not None else datetime.now()
+            _from = parser.parse(_params['from']) if _params and _params.get('from') is not None else _to
             _pattern = _get_param(_params, 'pattern', '%Y-%m-%d')
             data[_label] = [date_provider.date_time_between_dates(_from, _to).strftime(_pattern)
                             for i in range(length)]
@@ -332,7 +338,7 @@ def generate_pandas(conf_file):
             if _type is not None:
                 try:
                     _type = np.dtype(_type)
-                except TypeError, ex:
+                except TypeError as ex:
                     _type = np.float16
             else:
                 _type = np.float16
@@ -354,14 +360,14 @@ def generate(conf_file, output_file):
                 output = _get_param(conf, 'output')
             except yaml.YAMLError as exc:
                 raise ConfigurationException(exc.message, conf_file)
-    print('Output to %s' % (output if output else 'stdout'))
+    print('Output to %s' % (output or 'stdout'))
     if output:
         df.to_csv(output, sep=";", header=True, index=False, encoding='utf-8')
     else:
         print(df)
 
 
-def main(argv):
+def main(argv=None):
     parser = ArgumentParser(description='Generate artificial datasets which can be used for machine learning tasks')
     parser.add_argument('-o', '--output-file', required=False,
                         help='Output CSV file; overrides the one which is given in the specification')
