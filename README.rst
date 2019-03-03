@@ -1,6 +1,8 @@
 data-faker
 ===========
 
+Copyright (C) 2017 Paulius Danenas
+
 Generate synthetic datasets which can be used directly for research or train models, using YAML specifications. Currently, only Pandas dataframes are supported as output
 
 Installation
